@@ -5,9 +5,16 @@
  */
 package edu.kelompok5.tugasbesarpbo.controller;
 
+import edu.kelompok5.tugasbesarpbo.database.EasyShopDatabase;
+import edu.kelompok5.tugasbesarpbo.eror.BarangException;
 import edu.kelompok5.tugasbesarpbo.model.BarangModel;
+import edu.kelompok5.tugasbesarpbo.model.TabelBarangCari;
 import edu.kelompok5.tugasbesarpbo.view.MainViewShop;
-import java.awt.Panel;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.naming.spi.DirStateFactory;
 import javax.swing.JOptionPane;
 
 /**
@@ -51,6 +58,7 @@ public class BarangController {
                 model.insertBarang();
                 JOptionPane.showMessageDialog(view, "Data barang berhasil ditambahkan");
                 model.resetBarang();
+                view.btnAdd();
             } catch (Throwable throwable) {
                 JOptionPane.showMessageDialog(view, "Terjadi eror \n Eror Code "+throwable.getMessage());
             }
@@ -114,4 +122,12 @@ public class BarangController {
         
     }
     
-}
+    public void cariBarang(MainViewShop view) throws SQLException, BarangException{
+        String nama = view.getCari().getText();
+        TabelBarangCari tabelcari = new TabelBarangCari();
+        model.cariBarang(nama);
+        view.getHasilCari().setModel(tabelcari);
+    }
+}   
+    
+

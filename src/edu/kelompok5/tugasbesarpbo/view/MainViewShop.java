@@ -10,11 +10,14 @@ import edu.kelompok5.tugasbesarpbo.database.EasyShopDatabase;
 import edu.kelompok5.tugasbesarpbo.entity.Barang;
 import edu.kelompok5.tugasbesarpbo.eror.BarangException;
 import edu.kelompok5.tugasbesarpbo.event.BarangListener;
+import edu.kelompok5.tugasbesarpbo.impl.BarangDaoImpl;
 import edu.kelompok5.tugasbesarpbo.model.BarangModel;
+import edu.kelompok5.tugasbesarpbo.model.TabelBarangCari;
 import edu.kelompok5.tugasbesarpbo.model.TabelBarangModel;
 import edu.kelompok5.tugasbesarpbo.service.BarangDao;
 import java.awt.Color;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -24,7 +27,9 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.text.View;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -36,11 +41,15 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
      * Creates new form MainViewShop
      */
     private TabelBarangModel tabelModel;
+    private TabelBarangCari tabelCari;
     private BarangModel model;
     private BarangController controller;
+    private TableModel tmodel;
     
     public MainViewShop() {
         tabelModel = new TabelBarangModel();
+        tabelCari = new TabelBarangCari();
+        tmodel = new DefaultTableModel();
         
         model = new BarangModel();
         model.setListener(this);
@@ -50,9 +59,11 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         
         initComponents();
         jTableBarang.getSelectionModel().addListSelectionListener((ListSelectionListener) this);
-        jTableBarang.setModel(tabelModel);
+        jTableBarang.setModel(tabelModel);      
     }
     
+    String cariBarang;
+    String jenisBarang;
 
     public JTextField getjAddHBeli() {
         return jAddHBeli;
@@ -117,6 +128,47 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     public JTextField getjUpdateStok() {
         return jUpdateStok;
     }
+
+    public String getCariBarang() {
+        return cariBarang;
+    }
+
+    public void setCariBarang(String cariBarang) {
+        this.cariBarang = cariBarang;
+    }
+
+    public String getJenisBarang() {
+        return jenisBarang;
+    }
+
+    public void setJenisBarang(String jenisBarang) {
+        this.jenisBarang = jenisBarang;
+    }
+
+    public void setjCariharga(JTextField jCariharga) {
+        this.jCariharga = jCariharga;
+    }
+
+    public JTextField getCari() {
+        return cari;
+    }
+
+    public void setCari(JTextField cari) {
+        this.cari = cari;
+    }
+
+    public JTable getHasilCari() {
+        return hasilCari;
+    }
+
+    public void setHasilCari(JTable hasilCari) {
+        this.hasilCari = hasilCari;
+    }
+
+    
+    
+    
+    
   
     Color hitam = new Color(18,18,18);
     Color hitam2 = new Color(20, 20, 20);
@@ -144,17 +196,17 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         panelLogin.setVisible(false);
         panelRegister.setVisible(false);
         panelMenu.setVisible(true);
-        menuEasy.setVisible(true);
+        menuCount.setVisible(false);
         menuEdit.setVisible(false);
         menuShow.setVisible(false);
-        menuCount.setVisible(false);
+        menuEasy.setVisible(true);
     }
     
     private void btnEasy(){
-        menuEasy.setVisible(true);
+        menuCount.setVisible(false);
         menuEdit.setVisible(false);
         menuShow.setVisible(false);
-        menuCount.setVisible(false);
+        menuEasy.setVisible(true);
     }
     
     private void btnEasyClick(){
@@ -165,10 +217,10 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     }
     
     private void btnEdit(){
-        menuEasy.setVisible(false);
+        menuCount.setVisible(false);
         menuEdit.setVisible(true);
         menuShow.setVisible(false);
-        menuCount.setVisible(false);
+        menuEasy.setVisible(false);
     }
     
     private void btnEditClick(){
@@ -179,10 +231,10 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     }
     
     private void btnShow(){
-        menuEasy.setVisible(false);
+        menuCount.setVisible(false);
         menuEdit.setVisible(false);
         menuShow.setVisible(true);
-        menuCount.setVisible(false);
+        menuEasy.setVisible(false);
     }
     
     private void btnShowClick(){
@@ -193,10 +245,10 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     }
     
     private void btnCount(){
-        menuEasy.setVisible(false);
+        menuCount.setVisible(true);
         menuEdit.setVisible(false);
         menuShow.setVisible(false);
-        menuCount.setVisible(true);
+        menuEasy.setVisible(false);
     }
     
     private void btnCountClick(){
@@ -238,7 +290,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         }
     }
     
-    private void btnAdd(){
+    public void btnAdd(){
         tambahData.setVisible(true);
         updateData.setVisible(false);
         DeleteData.setVisible(false);
@@ -249,6 +301,8 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jAddHJual.setText("Harga Jual");
                 
     }
+    
+    
     
     private void btnupdate(){
         tambahData.setVisible(false);
@@ -280,6 +334,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
             btnDeleteData.setBackground(abu);
         }
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -339,6 +394,12 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         menuTop = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
+        menuEasy = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        hasilCari = new javax.swing.JTable();
+        jPanel4 = new javax.swing.JPanel();
+        cari = new javax.swing.JTextField();
+        jLabel30 = new javax.swing.JLabel();
         menuEdit = new javax.swing.JPanel();
         btnAddData = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
@@ -379,7 +440,6 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jPanel39 = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
-        menuEasy = new javax.swing.JPanel();
         menuShow = new javax.swing.JPanel();
         jLabel25 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -390,7 +450,14 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jLabel27 = new javax.swing.JLabel();
         btnDeleteData1 = new javax.swing.JPanel();
         jLabel28 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
         menuCount = new javax.swing.JPanel();
+        jLabel29 = new javax.swing.JLabel();
+        jPanel28 = new javax.swing.JPanel();
+        jCariBarang = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jPanel30 = new javax.swing.JPanel();
+        jCariharga = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -929,6 +996,59 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         );
 
         menuRight.add(menuTop, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 100));
+
+        menuEasy.setBackground(new java.awt.Color(24, 24, 24));
+        menuEasy.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        hasilCari.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(hasilCari);
+
+        menuEasy.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 260, 740, 180));
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+
+        cari.setText("Cari Barang");
+        cari.setBorder(null);
+        cari.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                cariKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                cariKeyReleased(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cari, javax.swing.GroupLayout.DEFAULT_SIZE, 730, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(cari, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+        );
+
+        menuEasy.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 190, 740, 40));
+
+        jLabel30.setFont(new java.awt.Font("Century Gothic", 1, 24)); // NOI18N
+        jLabel30.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel30.setText("Easy Cari Barang");
+        menuEasy.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 130, -1, -1));
+
+        menuRight.add(menuEasy, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 900, 550));
 
         menuEdit.setBackground(new java.awt.Color(24, 24, 24));
         menuEdit.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -1535,10 +1655,6 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
 
         menuRight.add(menuEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 900, 550));
 
-        menuEasy.setBackground(new java.awt.Color(24, 24, 24));
-        menuEasy.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        menuRight.add(menuEasy, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 900, 550));
-
         menuShow.setBackground(new java.awt.Color(24, 24, 24));
         menuShow.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -1579,7 +1695,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jTableBarang.setCellSelectionEnabled(true);
         jScrollPane1.setViewportView(jTableBarang);
 
-        menuShow.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 50, 870, 340));
+        menuShow.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 100, 840, 290));
         jScrollPane1.getAccessibleContext().setAccessibleParent(this);
 
         btnAddData1.setBackground(new java.awt.Color(18, 18, 18));
@@ -1687,10 +1803,95 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
 
         menuShow.add(btnDeleteData1, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 450, -1, -1));
 
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
+        });
+        menuShow.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 720, -1));
+
         menuRight.add(menuShow, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 900, 550));
 
         menuCount.setBackground(new java.awt.Color(24, 24, 24));
         menuCount.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel29.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
+        jLabel29.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel29.setText("Cari Harga");
+        menuCount.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, -1, -1));
+
+        jPanel28.setBackground(new java.awt.Color(255, 255, 255));
+
+        jCariBarang.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
+        jCariBarang.setText("Nama Barang");
+        jCariBarang.setBorder(null);
+        jCariBarang.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jCariBarangMouseClicked(evt);
+            }
+        });
+        jCariBarang.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jCariBarangKeyReleased(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel28Layout = new javax.swing.GroupLayout(jPanel28);
+        jPanel28.setLayout(jPanel28Layout);
+        jPanel28Layout.setHorizontalGroup(
+            jPanel28Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel28Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jCariBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 553, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel28Layout.setVerticalGroup(
+            jPanel28Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jCariBarang, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+        );
+
+        menuCount.add(jPanel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 150, 560, -1));
+
+        jButton1.setText("cari");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        menuCount.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 160, -1, -1));
+
+        jPanel30.setBackground(new java.awt.Color(255, 255, 255));
+
+        jCariharga.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
+        jCariharga.setText("Harga");
+        jCariharga.setBorder(null);
+        jCariharga.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jCarihargaMouseClicked(evt);
+            }
+        });
+        jCariharga.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jCarihargaKeyReleased(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel30Layout = new javax.swing.GroupLayout(jPanel30);
+        jPanel30.setLayout(jPanel30Layout);
+        jPanel30Layout.setHorizontalGroup(
+            jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel30Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jCariharga, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel30Layout.setVerticalGroup(
+            jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jCariharga, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+        );
+
+        menuCount.add(jPanel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 230, 230, -1));
+
         menuRight.add(menuCount, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 900, 550));
 
         panelMenu.add(menuRight, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 899, 650));
@@ -1963,6 +2164,69 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         btnEditClick();
     }//GEN-LAST:event_btnDeleteData1MouseClicked
 
+    private void jCariBarangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCariBarangMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCariBarangMouseClicked
+
+    private void jCariBarangKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jCariBarangKeyReleased
+        // TODO add your handling code here:
+              
+    }//GEN-LAST:event_jCariBarangKeyReleased
+
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+        // TODO add your handling code here     
+    }//GEN-LAST:event_jTextField1KeyReleased
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        String cari = jCariBarang.getText();
+        BarangDao dao = null;
+        try {
+            dao = EasyShopDatabase.getbarangDao();
+        } catch (SQLException ex) {
+            Logger.getLogger(MainViewShop.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Barang barang = null;
+        try {
+            barang = dao.getCari(cari);
+        } catch (BarangException ex) {
+            Logger.getLogger(MainViewShop.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        jCariharga.setText(barang.getHarga_jual().toString());
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jCarihargaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCarihargaMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCarihargaMouseClicked
+
+    private void jCarihargaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jCarihargaKeyReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCarihargaKeyReleased
+
+    private void cariKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cariKeyReleased
+        // TODO add your handling code here:
+        hasilCari.setModel(tmodel);
+        String cari2 = cari.getText();
+            try {
+            
+            BarangDao dao = EasyShopDatabase.getbarangDao();
+            tabelCari.setList(dao.selectCariBarang(cari2)); 
+            hasilCari.setModel(tabelCari);
+            } catch (SQLException ex) {
+            Logger.getLogger(MainViewShop.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BarangException ex) {
+            Logger.getLogger(MainViewShop.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            hasilCari.setModel(tabelCari);
+            onChange(model);       
+    }//GEN-LAST:event_cariKeyReleased
+
+    private void cariKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cariKeyPressed
+         // TODO add your handling code here:
+        
+    }//GEN-LAST:event_cariKeyPressed
+
     /**
      * @param args the command line arguments
      */
@@ -2012,11 +2276,16 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private javax.swing.JPanel btnUpdateData;
     private javax.swing.JPanel btnUpdateData1;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JTextField cari;
+    private javax.swing.JTable hasilCari;
     private javax.swing.JTextField jAddHBeli;
     private javax.swing.JTextField jAddHJual;
     private javax.swing.JTextField jAddKode;
     private javax.swing.JTextField jAddNama;
     private javax.swing.JTextField jAddStok;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JTextField jCariBarang;
+    private javax.swing.JTextField jCariharga;
     private javax.swing.JTextField jDeleteKode;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -2039,7 +2308,9 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -2055,8 +2326,10 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
@@ -2066,6 +2339,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel40;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -2076,7 +2350,9 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private javax.swing.JTextField jRegTelephone;
     private javax.swing.JTextField jRegUsername;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTableBarang;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jUpdateHBeli;
     private javax.swing.JTextField jUpdateHJual;
     private javax.swing.JTextField jUpdateKode;
@@ -2106,7 +2382,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     public void onChange(BarangModel model) {
         jUpdateKode.setText(model.getKode());
         jUpdateNama.setText(model.getNama_barang());
-        jUpdateStok.setText(model.getStok()+"");
+        jUpdateStok.setText( model.getStok()+"");
         jUpdateHJual.setText(model.getHarga_jual()+"");
         jUpdateHBeli.setText(model.getHarga_beli()+"");
     }
@@ -2146,4 +2422,5 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         } catch (IndexOutOfBoundsException exception) {
         }
     }
+
 }

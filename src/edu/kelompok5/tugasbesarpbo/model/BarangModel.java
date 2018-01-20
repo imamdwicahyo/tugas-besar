@@ -10,6 +10,7 @@ import edu.kelompok5.tugasbesarpbo.entity.Barang;
 import edu.kelompok5.tugasbesarpbo.eror.BarangException;
 import edu.kelompok5.tugasbesarpbo.event.BarangListener;
 import edu.kelompok5.tugasbesarpbo.service.BarangDao;
+import edu.kelompok5.tugasbesarpbo.view.MainViewShop;
 import java.sql.SQLException;
 
 /**
@@ -133,6 +134,13 @@ public class BarangModel {
         BarangDao dao = EasyShopDatabase.getbarangDao();
         dao.daleteBarang(kode);
         fireOnDelete();
+    }
+    
+    public void cariBarang(String nama) throws SQLException,BarangException{
+        BarangDao dao = EasyShopDatabase.getbarangDao();
+        Barang barang = new Barang();
+        dao.selectCariBarang(nama);
+        fireOnInsert(barang);
     }
     
     public void resetBarang(){

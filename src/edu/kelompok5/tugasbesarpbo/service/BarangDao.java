@@ -7,6 +7,7 @@ package edu.kelompok5.tugasbesarpbo.service;
 
 import edu.kelompok5.tugasbesarpbo.entity.Barang;
 import edu.kelompok5.tugasbesarpbo.eror.BarangException;
+import edu.kelompok5.tugasbesarpbo.view.MainViewShop;
 import java.util.List;
 
 /**
@@ -19,7 +20,9 @@ public interface BarangDao {
     public void updateBarang(Barang barang) throws BarangException;
     public void daleteBarang(String kode) throws BarangException;
     public Barang getBarang(String kode) throws BarangException;
+    public Barang getCari(String cari) throws BarangException;
     public List<Barang> selectAllBarang() throws BarangException;
+    public List<Barang> selectCariBarang(String nama) throws BarangException;
     
     
 }
