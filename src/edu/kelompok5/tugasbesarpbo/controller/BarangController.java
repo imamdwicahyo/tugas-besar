@@ -9,6 +9,7 @@ import edu.kelompok5.tugasbesarpbo.database.EasyShopDatabase;
 import edu.kelompok5.tugasbesarpbo.eror.BarangException;
 import edu.kelompok5.tugasbesarpbo.model.BarangModel;
 import edu.kelompok5.tugasbesarpbo.model.TabelBarangCari;
+import edu.kelompok5.tugasbesarpbo.service.BarangDao;
 import edu.kelompok5.tugasbesarpbo.view.MainViewShop;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -102,11 +103,6 @@ public class BarangController {
     }
     
     public void deleteBarang(MainViewShop view){
-        /**if (view.getjTableBarang().getSelectedRowCount()==0) {
-            JOptionPane.showMessageDialog(view, "Silakan pilih data yang akan dihapus");
-            return;
-        }*/
-        
         if (JOptionPane.showConfirmDialog(view, "Anda yakin akan menghapus data ini?")==JOptionPane.OK_OPTION) {
             String kode = view.getjDeleteKode().getText();
             model.setKode(kode);
@@ -122,12 +118,13 @@ public class BarangController {
         
     }
     
-    public void cariBarang(MainViewShop view) throws SQLException, BarangException{
+    public void cariBarang1(MainViewShop view) throws SQLException, BarangException{
         String nama = view.getCari().getText();
         TabelBarangCari tabelcari = new TabelBarangCari();
         model.cariBarang(nama);
         view.getHasilCari().setModel(tabelcari);
     }
+
 }   
     
 

@@ -10,14 +10,12 @@ import edu.kelompok5.tugasbesarpbo.database.EasyShopDatabase;
 import edu.kelompok5.tugasbesarpbo.entity.Barang;
 import edu.kelompok5.tugasbesarpbo.eror.BarangException;
 import edu.kelompok5.tugasbesarpbo.event.BarangListener;
-import edu.kelompok5.tugasbesarpbo.impl.BarangDaoImpl;
 import edu.kelompok5.tugasbesarpbo.model.BarangModel;
 import edu.kelompok5.tugasbesarpbo.model.TabelBarangCari;
 import edu.kelompok5.tugasbesarpbo.model.TabelBarangModel;
 import edu.kelompok5.tugasbesarpbo.service.BarangDao;
 import java.awt.Color;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -29,7 +27,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -45,6 +42,10 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private BarangModel model;
     private BarangController controller;
     private TableModel tmodel;
+    private String cari2;
+    private String username;
+    private String pass;
+    
     
     public MainViewShop() {
         tabelModel = new TabelBarangModel();
@@ -59,7 +60,17 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         
         initComponents();
         jTableBarang.getSelectionModel().addListSelectionListener((ListSelectionListener) this);
-        jTableBarang.setModel(tabelModel);      
+        jTableBarang.setModel(tabelModel);     
+        hasilCari.setModel(tabelCari);
+        
+        panelRegister.setVisible(false);
+        panelMenu.setVisible(false);
+        menuLeft.setVisible(false);
+        menuTop.setVisible(false);
+        menuCount.setVisible(false);
+        menuEdit.setVisible(false);
+        menuShow.setVisible(false);
+        menuEasy.setVisible(true);
     }
     
     String cariBarang;
@@ -145,10 +156,6 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         this.jenisBarang = jenisBarang;
     }
 
-    public void setjCariharga(JTextField jCariharga) {
-        this.jCariharga = jCariharga;
-    }
-
     public JTextField getCari() {
         return cari;
     }
@@ -165,47 +172,56 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         this.hasilCari = hasilCari;
     }
 
-    
-    
-    
-    
-  
+    public String getCari2() {
+        return cari2;
+    }
+
+    public void setTabelCari(TabelBarangCari tabelCari) {
+        this.tabelCari = tabelCari;
+    }
+
     Color hitam = new Color(18,18,18);
     Color hitam2 = new Color(20, 20, 20);
     Color abu = new Color(24, 24, 24);
     
-    private void btnLogin(){
-        panelLogin.setVisible(true);
+    private void btnReset(){
+        panelLogin.setVisible(false);
         panelRegister.setVisible(false);
         panelMenu.setVisible(false);
-        jLoginUsername.setText("Username");
-        jLoginPassword.setText("jPasswordField1");
+        menuLeft.setVisible(false);
+        menuTop.setVisible(false);
+        menuCount.setVisible(false);
+        menuEdit.setVisible(false);
+        menuShow.setVisible(false);
+        menuEasy.setVisible(false);
+    }
+    
+    private void btnDefaultMenu(){
+        panelMenu.setVisible(true);
+        menuLeft.setVisible(true);
+        menuTop.setVisible(true);
+    }
+    
+    private void btnLogin(){
+        btnReset();
+        panelLogin.setVisible(true);
     }
     
     private void btnRegister(){
-        panelLogin.setVisible(false);
+        btnReset();
         panelRegister.setVisible(true);
-        panelMenu.setVisible(false);
-        jRegUsername.setText("Username");
-        jRegPassword.setText("jPasswordField1");
-        jRegTelephone.setText("Telephone");
-        jRegEmail.setText("Email");
     }
     
     private void btnMenu(){
-        panelLogin.setVisible(false);
-        panelRegister.setVisible(false);
-        panelMenu.setVisible(true);
-        menuCount.setVisible(false);
-        menuEdit.setVisible(false);
-        menuShow.setVisible(false);
+        btnReset();
+        btnDefaultMenu();
         menuEasy.setVisible(true);
+        jUserName.setText(username);
     }
     
     private void btnEasy(){
-        menuCount.setVisible(false);
-        menuEdit.setVisible(false);
-        menuShow.setVisible(false);
+        btnReset();
+        btnDefaultMenu();
         menuEasy.setVisible(true);
     }
     
@@ -217,10 +233,9 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     }
     
     private void btnEdit(){
-        menuCount.setVisible(false);
+        btnReset();
+        btnDefaultMenu();
         menuEdit.setVisible(true);
-        menuShow.setVisible(false);
-        menuEasy.setVisible(false);
     }
     
     private void btnEditClick(){
@@ -231,10 +246,9 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     }
     
     private void btnShow(){
-        menuCount.setVisible(false);
-        menuEdit.setVisible(false);
+        btnReset();
+        btnDefaultMenu();
         menuShow.setVisible(true);
-        menuEasy.setVisible(false);
     }
     
     private void btnShowClick(){
@@ -245,10 +259,9 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     }
     
     private void btnCount(){
-        menuCount.setVisible(true);
-        menuEdit.setVisible(false);
-        menuShow.setVisible(false);
-        menuEasy.setVisible(false);
+        btnReset();
+        btnDefaultMenu();
+        menuCount.setVisible(true);;
     }
     
     private void btnCountClick(){
@@ -301,9 +314,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jAddHJual.setText("Harga Jual");
                 
     }
-    
-    
-    
+
     private void btnupdate(){
         tambahData.setVisible(false);
         updateData.setVisible(true);
@@ -334,8 +345,12 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
             btnDeleteData.setBackground(abu);
         }
     }
-
-
+    
+    public void resetText(JTextField text, String same){
+    if (text.getText().equals(same)) {
+            text.setText("");
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -354,11 +369,11 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         btnLogin = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        btnRegister2 = new javax.swing.JLabel();
         jWallpaper = new javax.swing.JLabel();
         panelRegister = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
+        btnLogin2 = new javax.swing.JLabel();
+        btnRegister = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jRegPassword = new javax.swing.JPasswordField();
@@ -387,19 +402,20 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         btnMenuCounting = new javax.swing.JPanel();
         warna4 = new javax.swing.JPanel();
         jLabel13 = new javax.swing.JLabel();
-        jPanel19 = new javax.swing.JPanel();
+        btnExit = new javax.swing.JPanel();
         jPanel20 = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
         menuRight = new javax.swing.JPanel();
         menuTop = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
+        jUserName = new javax.swing.JLabel();
         menuEasy = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         hasilCari = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         cari = new javax.swing.JTextField();
         jLabel30 = new javax.swing.JLabel();
+        jLabel31 = new javax.swing.JLabel();
         menuEdit = new javax.swing.JPanel();
         btnAddData = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
@@ -414,7 +430,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jAddNama = new javax.swing.JTextField();
         jPanel26 = new javax.swing.JPanel();
         jAddKode = new javax.swing.JTextField();
-        jPanel29 = new javax.swing.JPanel();
+        btnAddBarang = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
         jPanel35 = new javax.swing.JPanel();
         jAddHBeli = new javax.swing.JTextField();
@@ -427,7 +443,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jUpdateNama = new javax.swing.JTextField();
         jPanel33 = new javax.swing.JPanel();
         jUpdateKode = new javax.swing.JTextField();
-        jPanel34 = new javax.swing.JPanel();
+        btnUpdateBarang = new javax.swing.JPanel();
         jLabel21 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
         jPanel37 = new javax.swing.JPanel();
@@ -437,7 +453,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         DeleteData = new javax.swing.JPanel();
         jPanel38 = new javax.swing.JPanel();
         jDeleteKode = new javax.swing.JTextField();
-        jPanel39 = new javax.swing.JPanel();
+        btnDeleteBarang = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
         menuShow = new javax.swing.JPanel();
@@ -450,14 +466,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jLabel27 = new javax.swing.JLabel();
         btnDeleteData1 = new javax.swing.JPanel();
         jLabel28 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
         menuCount = new javax.swing.JPanel();
-        jLabel29 = new javax.swing.JLabel();
-        jPanel28 = new javax.swing.JPanel();
-        jCariBarang = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jPanel30 = new javax.swing.JPanel();
-        jCariharga = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -554,67 +563,67 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jLabel1.setText("  Easy Shop");
         panelLogin.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 90, 180, -1));
 
-        jLabel5.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setText("Sign Up");
-        jLabel5.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnRegister2.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
+        btnRegister2.setForeground(new java.awt.Color(255, 255, 255));
+        btnRegister2.setText("Sign Up");
+        btnRegister2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel5MouseClicked(evt);
+                btnRegister2MouseClicked(evt);
             }
         });
-        panelLogin.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 540, -1, 30));
+        panelLogin.add(btnRegister2, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 540, -1, 30));
 
         jWallpaper.setIcon(new javax.swing.ImageIcon(getClass().getResource("/edu/kelompok5/tugasbesarpbo/images/curve-simplicity.jpg"))); // NOI18N
-        jWallpaper.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jWallpaperMouseEntered(evt);
-            }
-        });
         panelLogin.add(jWallpaper, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1100, 650));
 
         getContentPane().add(panelLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1100, 650));
 
         panelRegister.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel6.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel6.setText("Sign In");
-        jLabel6.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnLogin2.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
+        btnLogin2.setForeground(new java.awt.Color(255, 255, 255));
+        btnLogin2.setText("Sign In");
+        btnLogin2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel6MouseClicked(evt);
+                btnLogin2MouseClicked(evt);
             }
         });
-        panelRegister.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 540, -1, 30));
+        panelRegister.add(btnLogin2, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 540, -1, 30));
 
-        jPanel5.setBackground(new java.awt.Color(51, 51, 51));
-        jPanel5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        btnRegister.setBackground(new java.awt.Color(51, 51, 51));
+        btnRegister.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        btnRegister.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnRegisterMouseClicked(evt);
+            }
+        });
 
         jLabel3.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Sign Up");
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout btnRegisterLayout = new javax.swing.GroupLayout(btnRegister);
+        btnRegister.setLayout(btnRegisterLayout);
+        btnRegisterLayout.setHorizontalGroup(
+            btnRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 86, Short.MAX_VALUE)
-            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+            .addGroup(btnRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnRegisterLayout.createSequentialGroup()
                     .addContainerGap(18, Short.MAX_VALUE)
                     .addComponent(jLabel3)
                     .addContainerGap(18, Short.MAX_VALUE)))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        btnRegisterLayout.setVerticalGroup(
+            btnRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 40, Short.MAX_VALUE)
-            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel5Layout.createSequentialGroup()
+            .addGroup(btnRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(btnRegisterLayout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(13, Short.MAX_VALUE)))
         );
 
-        panelRegister.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 450, 90, -1));
+        panelRegister.add(btnRegister, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 450, 90, -1));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -886,13 +895,13 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jLabel13.setText("Counting");
         btnMenuCounting.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 3, 90, 30));
 
-        jPanel19.setBackground(new java.awt.Color(18, 18, 18));
-        jPanel19.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnExit.setBackground(new java.awt.Color(18, 18, 18));
+        btnExit.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jPanel19MouseClicked(evt);
+                btnExitMouseClicked(evt);
             }
         });
-        jPanel19.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        btnExit.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel20.setBackground(new java.awt.Color(18, 18, 18));
 
@@ -907,12 +916,12 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
             .addGap(0, 40, Short.MAX_VALUE)
         );
 
-        jPanel19.add(jPanel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 10, 40));
+        btnExit.add(jPanel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 10, 40));
 
         jLabel14.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         jLabel14.setForeground(new java.awt.Color(255, 255, 255));
         jLabel14.setText("Exit");
-        jPanel19.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 3, 90, 30));
+        btnExit.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 3, 90, 30));
 
         javax.swing.GroupLayout menuLeftLayout = new javax.swing.GroupLayout(menuLeft);
         menuLeft.setLayout(menuLeftLayout);
@@ -930,7 +939,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
             .addComponent(btnMenuEdit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(btnMenuShow, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
             .addComponent(btnMenuCounting, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel19, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(btnExit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         menuLeftLayout.setVerticalGroup(
             menuLeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -952,7 +961,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMenuCounting, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 303, Short.MAX_VALUE)
-                .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -967,9 +976,9 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
 
         jLabel15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/edu/kelompok5/tugasbesarpbo/images/icons8-customer-50.png"))); // NOI18N
 
-        jLabel16.setFont(new java.awt.Font("Century Gothic", 1, 24)); // NOI18N
-        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel16.setText("Username");
+        jUserName.setFont(new java.awt.Font("Century Gothic", 1, 24)); // NOI18N
+        jUserName.setForeground(new java.awt.Color(255, 255, 255));
+        jUserName.setText("Username");
 
         javax.swing.GroupLayout menuTopLayout = new javax.swing.GroupLayout(menuTop);
         menuTop.setLayout(menuTopLayout);
@@ -979,7 +988,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
                 .addContainerGap(646, Short.MAX_VALUE)
                 .addComponent(jLabel15)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel16)
+                .addComponent(jUserName)
                 .addGap(69, 69, 69))
         );
         menuTopLayout.setVerticalGroup(
@@ -991,7 +1000,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
                         .addComponent(jLabel15))
                     .addGroup(menuTopLayout.createSequentialGroup()
                         .addGap(30, 30, 30)
-                        .addComponent(jLabel16)))
+                        .addComponent(jUserName)))
                 .addContainerGap(29, Short.MAX_VALUE))
         );
 
@@ -1013,16 +1022,19 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         ));
         jScrollPane2.setViewportView(hasilCari);
 
-        menuEasy.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 260, 740, 180));
+        menuEasy.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 230, 740, 180));
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
 
+        cari.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         cari.setText("Cari Barang");
         cari.setBorder(null);
-        cari.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                cariKeyPressed(evt);
+        cari.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cariMouseClicked(evt);
             }
+        });
+        cari.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 cariKeyReleased(evt);
             }
@@ -1041,12 +1053,17 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
             .addComponent(cari, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        menuEasy.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 190, 740, 40));
+        menuEasy.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 170, 740, 40));
 
         jLabel30.setFont(new java.awt.Font("Century Gothic", 1, 24)); // NOI18N
         jLabel30.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel30.setText("Easy Cari Barang");
-        menuEasy.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 130, -1, -1));
+        jLabel30.setText("Cara Mudah Cari Barang..");
+        menuEasy.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 100, -1, -1));
+
+        jLabel31.setFont(new java.awt.Font("Century Gothic", 1, 24)); // NOI18N
+        jLabel31.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel31.setText("Easy....");
+        menuEasy.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 60, -1, -1));
 
         menuRight.add(menuEasy, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 900, 550));
 
@@ -1229,14 +1246,11 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
             .addComponent(jAddKode, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        jPanel29.setBackground(new java.awt.Color(18, 18, 18));
-        jPanel29.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
-        jPanel29.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnAddBarang.setBackground(new java.awt.Color(18, 18, 18));
+        btnAddBarang.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+        btnAddBarang.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jPanel29MouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jPanel29MouseEntered(evt);
+                btnAddBarangMouseClicked(evt);
             }
         });
 
@@ -1244,18 +1258,18 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jLabel20.setForeground(new java.awt.Color(255, 255, 255));
         jLabel20.setText("Add");
 
-        javax.swing.GroupLayout jPanel29Layout = new javax.swing.GroupLayout(jPanel29);
-        jPanel29.setLayout(jPanel29Layout);
-        jPanel29Layout.setHorizontalGroup(
-            jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel29Layout.createSequentialGroup()
+        javax.swing.GroupLayout btnAddBarangLayout = new javax.swing.GroupLayout(btnAddBarang);
+        btnAddBarang.setLayout(btnAddBarangLayout);
+        btnAddBarangLayout.setHorizontalGroup(
+            btnAddBarangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnAddBarangLayout.createSequentialGroup()
                 .addContainerGap(107, Short.MAX_VALUE)
                 .addComponent(jLabel20)
                 .addGap(116, 116, 116))
         );
-        jPanel29Layout.setVerticalGroup(
-            jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel29Layout.createSequentialGroup()
+        btnAddBarangLayout.setVerticalGroup(
+            btnAddBarangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnAddBarangLayout.createSequentialGroup()
                 .addContainerGap(44, Short.MAX_VALUE)
                 .addComponent(jLabel20)
                 .addGap(42, 42, 42))
@@ -1331,7 +1345,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
                                     .addComponent(jPanel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jPanel27, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addComponent(jPanel29, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnAddBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(117, 117, 117))))
         );
         tambahDataLayout.setVerticalGroup(
@@ -1354,7 +1368,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 122, Short.MAX_VALUE))))
                     .addGroup(tambahDataLayout.createSequentialGroup()
                         .addGap(45, 45, 45)
-                        .addComponent(jPanel29, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnAddBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(129, Short.MAX_VALUE))
         );
 
@@ -1434,11 +1448,11 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
             .addComponent(jUpdateKode, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        jPanel34.setBackground(new java.awt.Color(18, 18, 18));
-        jPanel34.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
-        jPanel34.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnUpdateBarang.setBackground(new java.awt.Color(18, 18, 18));
+        btnUpdateBarang.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+        btnUpdateBarang.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jPanel34MouseClicked(evt);
+                btnUpdateBarangMouseClicked(evt);
             }
         });
 
@@ -1446,18 +1460,18 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jLabel21.setForeground(new java.awt.Color(255, 255, 255));
         jLabel21.setText("Update");
 
-        javax.swing.GroupLayout jPanel34Layout = new javax.swing.GroupLayout(jPanel34);
-        jPanel34.setLayout(jPanel34Layout);
-        jPanel34Layout.setHorizontalGroup(
-            jPanel34Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel34Layout.createSequentialGroup()
+        javax.swing.GroupLayout btnUpdateBarangLayout = new javax.swing.GroupLayout(btnUpdateBarang);
+        btnUpdateBarang.setLayout(btnUpdateBarangLayout);
+        btnUpdateBarangLayout.setHorizontalGroup(
+            btnUpdateBarangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnUpdateBarangLayout.createSequentialGroup()
                 .addContainerGap(107, Short.MAX_VALUE)
                 .addComponent(jLabel21)
                 .addGap(116, 116, 116))
         );
-        jPanel34Layout.setVerticalGroup(
-            jPanel34Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel34Layout.createSequentialGroup()
+        btnUpdateBarangLayout.setVerticalGroup(
+            btnUpdateBarangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnUpdateBarangLayout.createSequentialGroup()
                 .addContainerGap(44, Short.MAX_VALUE)
                 .addComponent(jLabel21)
                 .addGap(42, 42, 42))
@@ -1536,7 +1550,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
                             .addComponent(jPanel40, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jPanel37, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel34, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnUpdateBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(72, 72, 72))))
         );
         updateDataLayout.setVerticalGroup(
@@ -1556,7 +1570,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
                         .addComponent(jPanel40, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jPanel37, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel34, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnUpdateBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(140, Short.MAX_VALUE))
         );
 
@@ -1588,11 +1602,11 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
             .addComponent(jDeleteKode, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        jPanel39.setBackground(new java.awt.Color(18, 18, 18));
-        jPanel39.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
-        jPanel39.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnDeleteBarang.setBackground(new java.awt.Color(18, 18, 18));
+        btnDeleteBarang.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+        btnDeleteBarang.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jPanel39MouseClicked(evt);
+                btnDeleteBarangMouseClicked(evt);
             }
         });
 
@@ -1600,18 +1614,18 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jLabel23.setForeground(new java.awt.Color(255, 255, 255));
         jLabel23.setText("Delete");
 
-        javax.swing.GroupLayout jPanel39Layout = new javax.swing.GroupLayout(jPanel39);
-        jPanel39.setLayout(jPanel39Layout);
-        jPanel39Layout.setHorizontalGroup(
-            jPanel39Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel39Layout.createSequentialGroup()
+        javax.swing.GroupLayout btnDeleteBarangLayout = new javax.swing.GroupLayout(btnDeleteBarang);
+        btnDeleteBarang.setLayout(btnDeleteBarangLayout);
+        btnDeleteBarangLayout.setHorizontalGroup(
+            btnDeleteBarangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnDeleteBarangLayout.createSequentialGroup()
                 .addContainerGap(107, Short.MAX_VALUE)
                 .addComponent(jLabel23)
                 .addGap(116, 116, 116))
         );
-        jPanel39Layout.setVerticalGroup(
-            jPanel39Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel39Layout.createSequentialGroup()
+        btnDeleteBarangLayout.setVerticalGroup(
+            btnDeleteBarangLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnDeleteBarangLayout.createSequentialGroup()
                 .addContainerGap(44, Short.MAX_VALUE)
                 .addComponent(jLabel23)
                 .addGap(42, 42, 42))
@@ -1633,7 +1647,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
                 .addContainerGap(135, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, DeleteDataLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel39, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnDeleteBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(295, 295, 295))
         );
         DeleteDataLayout.setVerticalGroup(
@@ -1647,7 +1661,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
                         .addGap(121, 121, 121)
                         .addComponent(jPanel38, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(90, 90, 90)
-                .addComponent(jPanel39, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnDeleteBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(140, Short.MAX_VALUE))
         );
 
@@ -1658,11 +1672,11 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         menuShow.setBackground(new java.awt.Color(24, 24, 24));
         menuShow.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel25.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
+        jLabel25.setFont(new java.awt.Font("Century Gothic", 1, 24)); // NOI18N
         jLabel25.setForeground(new java.awt.Color(255, 255, 255));
         jLabel25.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel25.setText("Daftar Barang");
-        menuShow.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(331, 0, 200, 30));
+        menuShow.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 10, 200, 30));
 
         jTableBarang.setBackground(new java.awt.Color(204, 204, 204));
         jTableBarang.setModel(new javax.swing.table.DefaultTableModel(
@@ -1695,7 +1709,7 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         jTableBarang.setCellSelectionEnabled(true);
         jScrollPane1.setViewportView(jTableBarang);
 
-        menuShow.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 100, 840, 290));
+        menuShow.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 60, 840, 350));
         jScrollPane1.getAccessibleContext().setAccessibleParent(this);
 
         btnAddData1.setBackground(new java.awt.Color(18, 18, 18));
@@ -1803,95 +1817,10 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
 
         menuShow.add(btnDeleteData1, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 450, -1, -1));
 
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                jTextField1KeyReleased(evt);
-            }
-        });
-        menuShow.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 720, -1));
-
         menuRight.add(menuShow, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 900, 550));
 
         menuCount.setBackground(new java.awt.Color(24, 24, 24));
         menuCount.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel29.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
-        jLabel29.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel29.setText("Cari Harga");
-        menuCount.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, -1, -1));
-
-        jPanel28.setBackground(new java.awt.Color(255, 255, 255));
-
-        jCariBarang.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
-        jCariBarang.setText("Nama Barang");
-        jCariBarang.setBorder(null);
-        jCariBarang.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jCariBarangMouseClicked(evt);
-            }
-        });
-        jCariBarang.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                jCariBarangKeyReleased(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel28Layout = new javax.swing.GroupLayout(jPanel28);
-        jPanel28.setLayout(jPanel28Layout);
-        jPanel28Layout.setHorizontalGroup(
-            jPanel28Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel28Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jCariBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 553, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel28Layout.setVerticalGroup(
-            jPanel28Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jCariBarang, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-        );
-
-        menuCount.add(jPanel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 150, 560, -1));
-
-        jButton1.setText("cari");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        menuCount.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 160, -1, -1));
-
-        jPanel30.setBackground(new java.awt.Color(255, 255, 255));
-
-        jCariharga.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
-        jCariharga.setText("Harga");
-        jCariharga.setBorder(null);
-        jCariharga.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jCarihargaMouseClicked(evt);
-            }
-        });
-        jCariharga.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                jCarihargaKeyReleased(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel30Layout = new javax.swing.GroupLayout(jPanel30);
-        jPanel30.setLayout(jPanel30Layout);
-        jPanel30Layout.setHorizontalGroup(
-            jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel30Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jCariharga, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel30Layout.setVerticalGroup(
-            jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jCariharga, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-        );
-
-        menuCount.add(jPanel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 230, 230, -1));
-
         menuRight.add(menuCount, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 900, 550));
 
         panelMenu.add(menuRight, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 899, 650));
@@ -1899,68 +1828,59 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         getContentPane().add(panelMenu, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1100, 650));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLoginUsernameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLoginUsernameMouseClicked
-        if (jLoginUsername.getText().equals("Username")) {
-            jLoginUsername.setText("");
-        }
+        resetText(jLoginUsername, "Username");
     }//GEN-LAST:event_jLoginUsernameMouseClicked
 
     private void jLoginPasswordMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLoginPasswordMouseClicked
-        if (jLoginPassword.getText().equals("jPasswordField1")) {
-            jLoginPassword.setText("");
-        }
+        resetText(jLoginPassword, "jPasswordField1");
     }//GEN-LAST:event_jLoginPasswordMouseClicked
 
     private void jRegPasswordMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRegPasswordMouseClicked
-        if (jRegPassword.getText().equals("jPasswordField1")) {
-            jRegPassword.setText("");
-        }
+        resetText(jRegPassword, "jPasswordField1");
     }//GEN-LAST:event_jRegPasswordMouseClicked
 
     private void jRegUsernameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRegUsernameMouseClicked
-        if (jRegUsername.getText().equals("Username")) {
-            jRegUsername.setText("");
-        }
+        resetText(jRegUsername, "Username");
     }//GEN-LAST:event_jRegUsernameMouseClicked
 
     private void jRegEmailMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRegEmailMouseClicked
-        if (jRegEmail.getText().equals("Email")) {
-            jRegEmail.setText("");
-        }
+        resetText(jRegEmail, "Email");
     }//GEN-LAST:event_jRegEmailMouseClicked
 
     private void jRegTelephoneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRegTelephoneMouseClicked
-        if (jRegTelephone.getText().equals("Telephone")) {
-            jRegTelephone.setText("");
-        }
+        resetText(jRegTelephone, "Telephone");
     }//GEN-LAST:event_jRegTelephoneMouseClicked
 
-    private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked
+    private void btnLogin2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLogin2MouseClicked
         btnLogin();
-    }//GEN-LAST:event_jLabel6MouseClicked
+    }//GEN-LAST:event_btnLogin2MouseClicked
 
-    private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
+    private void btnRegister2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegister2MouseClicked
         btnRegister();
-    }//GEN-LAST:event_jLabel5MouseClicked
+    }//GEN-LAST:event_btnRegister2MouseClicked
 
     private void btnLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoginMouseClicked
-        btnMenu();
+        if (jLoginUsername.getText().equals(username)&&jLoginPassword.getText().equals(pass)) {
+            btnMenu();
+        } else {
+            JOptionPane.showMessageDialog(null, "Username atau Password salah");
+        }
+        
+        
     }//GEN-LAST:event_btnLoginMouseClicked
 
-    private void jWallpaperMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jWallpaperMouseEntered
-        panelRegister.setVisible(false);
-        panelMenu.setVisible(false);
-    }//GEN-LAST:event_jWallpaperMouseEntered
-
-    private void jPanel19MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel19MouseClicked
+    private void btnExitMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnExitMouseClicked
         btnLogin();
-    }//GEN-LAST:event_jPanel19MouseClicked
+    }//GEN-LAST:event_btnExitMouseClicked
 
     private void btnMenuEasyMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMenuEasyMouseClicked
         btnEasy();
         btnEasyClick();
+        cari.setText("Cari Barang");
     }//GEN-LAST:event_btnMenuEasyMouseClicked
 
     private void btnMenuEditMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMenuEditMouseClicked
@@ -1969,8 +1889,8 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     }//GEN-LAST:event_btnMenuEditMouseClicked
 
     private void btnMenuShowMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMenuShowMouseClicked
-       btnShow();
-       btnShowClick();
+        btnShow();
+        btnShowClick();
     }//GEN-LAST:event_btnMenuShowMouseClicked
 
     private void btnMenuCountingMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMenuCountingMouseClicked
@@ -1993,24 +1913,20 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         btnEditColor(btnDeleteData);
     }//GEN-LAST:event_btnDeleteDataMouseClicked
 
-    private void jPanel29MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel29MouseEntered
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jPanel29MouseEntered
-
-    private void jPanel29MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel29MouseClicked
+    private void btnAddBarangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAddBarangMouseClicked
          // TODO add your handling code here:
          controller.insertBarang(this);
-    }//GEN-LAST:event_jPanel29MouseClicked
+    }//GEN-LAST:event_btnAddBarangMouseClicked
 
-    private void jPanel34MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel34MouseClicked
+    private void btnUpdateBarangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnUpdateBarangMouseClicked
          // TODO add your handling code here:
          controller.updateBarang(this);
-    }//GEN-LAST:event_jPanel34MouseClicked
+    }//GEN-LAST:event_btnUpdateBarangMouseClicked
 
-    private void jPanel39MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel39MouseClicked
+    private void btnDeleteBarangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDeleteBarangMouseClicked
          // TODO add your handling code here:
          controller.deleteBarang(this);
-    }//GEN-LAST:event_jPanel39MouseClicked
+    }//GEN-LAST:event_btnDeleteBarangMouseClicked
 
     private void btnMenuEasyMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMenuEasyMouseEntered
          // TODO add your handling code here:
@@ -2054,86 +1970,66 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
 
     private void jAddKodeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddKodeMouseClicked
          // TODO add your handling code here:
-         if (jAddKode.getText().equals("Kode Barang")) {
-            jAddKode.setText("");
-        }
+         resetText(jAddKode, "Kode Barang");
     }//GEN-LAST:event_jAddKodeMouseClicked
 
     private void jAddNamaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddNamaMouseClicked
          // TODO add your handling code here:
-         if (jAddNama.getText().equals("Nama Barang")) {
-            jAddNama.setText("");
-         }
+         resetText(jAddNama, "Nama Barang");
     }//GEN-LAST:event_jAddNamaMouseClicked
 
     private void jAddStokMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddStokMouseClicked
         // TODO add your handling code here:
-        if (jAddStok.getText().equals("Stok")) {
-            jAddStok.setText("");
-        }
+        resetText(jAddStok, "Stok");
     }//GEN-LAST:event_jAddStokMouseClicked
 
     private void jAddHBeliMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddHBeliMouseClicked
         // TODO add your handling code here:
-        if (jAddHBeli.getText().equals("Harga Beli")) {
-            jAddHBeli.setText("");
-        }
+        resetText(jAddHBeli, "Harga Beli");
     }//GEN-LAST:event_jAddHBeliMouseClicked
 
     private void jAddHJualMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddHJualMouseClicked
         // TODO add your handling code here:
-        if (jAddHJual.getText().equals("Harga Jual")) {
-            jAddHJual.setText("");
-        }
+        resetText(jAddHJual, "Harga Jual");
     }//GEN-LAST:event_jAddHJualMouseClicked
 
     private void jUpdateKodeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jUpdateKodeMouseClicked
         // TODO add your handling code here:
-        if (jUpdateKode.getText().equals("Kode Barang")) {
-            jUpdateKode.setText("");
-        }
+        resetText(jUpdateKode, "Kode Barang");
     }//GEN-LAST:event_jUpdateKodeMouseClicked
 
     private void jUpdateNamaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jUpdateNamaMouseClicked
         // TODO add your handling code here:
-        if (jUpdateNama.getText().equals("Nama Barang")) {
-            jUpdateNama.setText("");
-         }
+        resetText(jUpdateNama, "Nama Barang");
     }//GEN-LAST:event_jUpdateNamaMouseClicked
 
     private void jUpdateStokMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jUpdateStokMouseClicked
         // TODO add your handling code here:
-        if (jUpdateStok.getText().equals("Stok")) {
-            jUpdateStok.setText("");
-        }
+        resetText(jUpdateStok, "Stok");
     }//GEN-LAST:event_jUpdateStokMouseClicked
 
     private void jUpdateHBeliMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jUpdateHBeliMouseClicked
         // TODO add your handling code here:
-        if (jUpdateHBeli.getText().equals("Harga Beli")) {
-            jUpdateHBeli.setText("");
-        }
+        resetText(jUpdateHBeli, "Harga Beli");
     }//GEN-LAST:event_jUpdateHBeliMouseClicked
 
     private void jUpdateHJualMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jUpdateHJualMouseClicked
         // TODO add your handling code here:
-        if (jUpdateHJual.getText().equals("Harga Jual")) {
-            jUpdateHJual.setText("");
-        }
+        resetText(jUpdateHJual, "Harga Jual");
     }//GEN-LAST:event_jUpdateHJualMouseClicked
 
     private void jDeleteKodeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jDeleteKodeMouseClicked
         // TODO add your handling code here:
-        if (jDeleteKode.getText().equals("Kode Barang")) {
-            jDeleteKode.setText("");
-        }
+        resetText(jDeleteKode, "Kode Barang");
     }//GEN-LAST:event_jDeleteKodeMouseClicked
 
     private void btnAddData1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAddData1MouseClicked
         // TODO add your handling code here:
-        menuShow.setVisible(false);
+        btnReset();
+        btnDefaultMenu();
         menuEdit.setVisible(true);
         btnAdd();
+        btnEditClick();
     }//GEN-LAST:event_btnAddData1MouseClicked
 
     private void btnUpdateData1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnUpdateData1MouseClicked
@@ -2164,52 +2060,11 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
         btnEditClick();
     }//GEN-LAST:event_btnDeleteData1MouseClicked
 
-    private void jCariBarangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCariBarangMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCariBarangMouseClicked
-
-    private void jCariBarangKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jCariBarangKeyReleased
-        // TODO add your handling code here:
-              
-    }//GEN-LAST:event_jCariBarangKeyReleased
-
-    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
-        // TODO add your handling code here     
-    }//GEN-LAST:event_jTextField1KeyReleased
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        String cari = jCariBarang.getText();
-        BarangDao dao = null;
-        try {
-            dao = EasyShopDatabase.getbarangDao();
-        } catch (SQLException ex) {
-            Logger.getLogger(MainViewShop.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        Barang barang = null;
-        try {
-            barang = dao.getCari(cari);
-        } catch (BarangException ex) {
-            Logger.getLogger(MainViewShop.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        jCariharga.setText(barang.getHarga_jual().toString());
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jCarihargaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCarihargaMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCarihargaMouseClicked
-
-    private void jCarihargaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jCarihargaKeyReleased
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCarihargaKeyReleased
-
     private void cariKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cariKeyReleased
         // TODO add your handling code here:
         hasilCari.setModel(tmodel);
-        String cari2 = cari.getText();
-            try {
-            
+        cari2 = cari.getText();
+            try {          
             BarangDao dao = EasyShopDatabase.getbarangDao();
             tabelCari.setList(dao.selectCariBarang(cari2)); 
             hasilCari.setModel(tabelCari);
@@ -2222,10 +2077,19 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
             onChange(model);       
     }//GEN-LAST:event_cariKeyReleased
 
-    private void cariKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cariKeyPressed
+    private void cariMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cariMouseClicked
          // TODO add your handling code here:
-        
-    }//GEN-LAST:event_cariKeyPressed
+         resetText(cari, "Cari Barang");
+    }//GEN-LAST:event_cariMouseClicked
+
+    private void btnRegisterMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegisterMouseClicked
+        // TODO add your handling code here:
+        username = jRegUsername.getText();
+        pass = jRegPassword.getText();
+        JOptionPane.showMessageDialog(null, "Pendaftaran berhasil silakan lakukan login");
+        btnReset();
+        btnLogin();
+    }//GEN-LAST:event_btnRegisterMouseClicked
 
     /**
      * @param args the command line arguments
@@ -2264,15 +2128,22 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel DeleteData;
+    private javax.swing.JPanel btnAddBarang;
     private javax.swing.JPanel btnAddData;
     private javax.swing.JPanel btnAddData1;
+    private javax.swing.JPanel btnDeleteBarang;
     private javax.swing.JPanel btnDeleteData;
     private javax.swing.JPanel btnDeleteData1;
+    private javax.swing.JPanel btnExit;
     private javax.swing.JPanel btnLogin;
+    private javax.swing.JLabel btnLogin2;
     private javax.swing.JPanel btnMenuCounting;
     private javax.swing.JPanel btnMenuEasy;
     private javax.swing.JPanel btnMenuEdit;
     private javax.swing.JPanel btnMenuShow;
+    private javax.swing.JPanel btnRegister;
+    private javax.swing.JLabel btnRegister2;
+    private javax.swing.JPanel btnUpdateBarang;
     private javax.swing.JPanel btnUpdateData;
     private javax.swing.JPanel btnUpdateData1;
     private javax.swing.ButtonGroup buttonGroup1;
@@ -2283,9 +2154,6 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private javax.swing.JTextField jAddKode;
     private javax.swing.JTextField jAddNama;
     private javax.swing.JTextField jAddStok;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JTextField jCariBarang;
-    private javax.swing.JTextField jCariharga;
     private javax.swing.JTextField jDeleteKode;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -2294,7 +2162,6 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
@@ -2308,40 +2175,31 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
+    private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPasswordField jLoginPassword;
     private javax.swing.JTextField jLoginUsername;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
-    private javax.swing.JPanel jPanel28;
-    private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
-    private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
-    private javax.swing.JPanel jPanel39;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel40;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
@@ -2352,12 +2210,12 @@ public class MainViewShop extends javax.swing.JFrame implements BarangListener, 
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTableBarang;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jUpdateHBeli;
     private javax.swing.JTextField jUpdateHJual;
     private javax.swing.JTextField jUpdateKode;
     private javax.swing.JTextField jUpdateNama;
     private javax.swing.JTextField jUpdateStok;
+    private javax.swing.JLabel jUserName;
     private javax.swing.JLabel jWallpaper;
     private javax.swing.JLabel jWallpaper1;
     private javax.swing.JPanel menuCount;

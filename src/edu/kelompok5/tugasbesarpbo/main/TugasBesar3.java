@@ -5,14 +5,9 @@
  */
 package edu.kelompok5.tugasbesarpbo.main;
 
-import edu.kelompok5.tugasbesarpbo.database.EasyShopDatabase;
-import edu.kelompok5.tugasbesarpbo.entity.Barang;
 import edu.kelompok5.tugasbesarpbo.eror.BarangException;
-import edu.kelompok5.tugasbesarpbo.model.BarangModel;
-import edu.kelompok5.tugasbesarpbo.service.BarangDao;
 import edu.kelompok5.tugasbesarpbo.view.MainViewShop;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;

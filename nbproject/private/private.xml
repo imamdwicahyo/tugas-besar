@@ -3,17 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/model/TabelBarangCari.java</file>
             <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/main/TugasBesar3.java</file>
-            <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/event/BarangListener.java</file>
-            <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/service/BarangDao.java</file>
-            <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/entity/Barang.java</file>
-            <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/eror/BarangException.java</file>
             <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/controller/BarangController.java</file>
-            <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/model/TabelBarangModel.java</file>
-            <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/database/EasyShopDatabase.java</file>
-            <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/impl/BarangDaoImpl.java</file>
-            <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/model/BarangModel.java</file>
             <file>file:/D:/NetbeansProject/Latihan/TugasBesar3/src/edu/kelompok5/tugasbesarpbo/view/MainViewShop.java</file>
         </group>
     </open-files>
